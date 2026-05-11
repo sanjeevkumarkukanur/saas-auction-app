@@ -4,13 +4,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
+
+interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const auth = req.headers.authorization;
 
     if (!auth || !auth.startsWith('Bearer ')) {

@@ -1,10 +1,11 @@
-import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
-  private client: Redis;
+
+  private readonly client: Redis;
 
   constructor() {
     this.client = new Redis({
@@ -12,14 +13,49 @@ export class RedisService implements OnModuleDestroy {
       port: Number(process.env.REDIS_PORT) || 6379,
       password: process.env.REDIS_PASSWORD || undefined,
       db: Number(process.env.REDIS_DB) || 0,
+
       retryStrategy: (times) => Math.min(times * 50, 2000),
     });
 
-    this.client.on('connect', () => this.logger.log('Redis connected'));
-    this.client.on('error', (err) => this.logger.error('Redis error', err));
+    this.client.on('connect', () => {
+      this.logger.log('✅ Redis connected');
+    });
+
+    this.client.on('error', (error) => {
+      this.logger.error('❌ Redis error', error);
+    });
   }
 
-  // 🔹 Raw helpers (no JSON)
+  // =========================
+  // Generic JSON Helpers
+  // =========================
+
+  async get<T>(key: string): Promise<T | null> {
+    const value = await this.client.get(key);
+
+    if (!value) return null;
+
+    return JSON.parse(value) as T;
+  }
+
+  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    const serialized = JSON.stringify(value);
+
+    if (ttlSeconds && ttlSeconds > 0) {
+      await this.client.set(key, serialized, 'EX', ttlSeconds);
+    } else {
+      await this.client.set(key, serialized);
+    }
+  }
+
+  async del(key: string): Promise<void> {
+    await this.client.del(key);
+  }
+
+  // =========================
+  // Raw Helpers
+  // =========================
+
   async getRaw(key: string): Promise<string | null> {
     return this.client.get(key);
   }
@@ -36,8 +72,9 @@ export class RedisService implements OnModuleDestroy {
     await this.client.del(key);
   }
 
-  async onModuleDestroy() {
+  async onModuleDestroy(): Promise<void> {
     await this.client.quit();
+
     this.logger.log('Redis connection closed');
   }
 }

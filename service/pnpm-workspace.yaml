@@ -1,0 +1,14 @@
+packages:
+  - apps/*
+  - apps/platform/*
+  - apps/commerce/*
+  - apps/marketplace/*
+  - libs/*
+
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - bcrypt
+  - prisma
+  - unrs-resolver

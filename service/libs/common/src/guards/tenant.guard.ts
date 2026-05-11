@@ -4,20 +4,25 @@ import {
   Injectable,
   ForbiddenException,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { TenantContext } from '../interfaces/tenant-context.interface';
+
+interface TenantRequest extends Request {
+  tenantId?: string;
+  tenant?: TenantContext;
+}
 
 @Injectable()
 export class TenantGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest<TenantRequest>();
 
-    // tenantId comes from TenantMiddleware (JWT) or x-tenant-id header
-    const tenantId = req.tenantId || req.headers['x-tenant-id'];
+    const tenantId = req.tenantId ?? req.headers['x-tenant-id'];
 
-    if (!tenantId) {
+    if (!tenantId || typeof tenantId !== 'string') {
       throw new ForbiddenException('Tenant ID is required');
     }
 
-    // Attach to request for downstream use
     req.tenantId = tenantId;
     req.tenant = { id: tenantId };
 

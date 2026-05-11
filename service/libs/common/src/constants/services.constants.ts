@@ -1,4 +1,6 @@
 export const ServicePorts = {
+  GATEWAY: 3000,
+  AUTH: 4000,
   GAME: 4001,
   LEAGUE: 4002,
   TEAM: 4003,
@@ -13,26 +15,18 @@ export const ServicePorts = {
   MATCH: 4012,
   STATS: 4013,
   PLATFORM: 4014,
-};
+} as const;
 
-export const Services = {
-  GAME: `http://localhost:${ServicePorts.GAME}`,
-  LEAGUE: `http://localhost:${ServicePorts.LEAGUE}`,
-  TEAM: `http://localhost:${ServicePorts.TEAM}`,
-  PLAYER: `http://localhost:${ServicePorts.PLAYER}`,
-  AUCTION: `http://localhost:${ServicePorts.AUCTION}`,
-  TENANT: `http://localhost:${ServicePorts.TENANT}`,
-  BILLING: `http://localhost:${ServicePorts.BILLING}`,
-  NOTIFICATION: `http://localhost:${ServicePorts.NOTIFICATION}`,
-  REALTIME: `http://localhost:${ServicePorts.REALTIME}`,
-  FIELD: `http://localhost:${ServicePorts.FIELD}`,
-  TOURNAMENT: `http://localhost:${ServicePorts.TOURNAMENT}`,
-  MATCH: `http://localhost:${ServicePorts.MATCH}`,
-  STATS: `http://localhost:${ServicePorts.STATS}`,
-  PLATFORM: `http://localhost:${ServicePorts.PLATFORM}`,
-};
+export const Services = Object.fromEntries(
+  Object.entries(ServicePorts).map(([key, port]) => [
+    key,
+    `http://localhost:${port}`,
+  ]),
+) as Record<keyof typeof ServicePorts, string>;
 
 export const SERVICES = {
+  GATEWAY_SERVICE: 'GATEWAY_SERVICE',
+  AUTH_SERVICE: 'AUTH_SERVICE',
   GAME_SERVICE: 'GAME_SERVICE',
   LEAGUE_SERVICE: 'LEAGUE_SERVICE',
   TEAM_SERVICE: 'TEAM_SERVICE',
@@ -47,4 +41,4 @@ export const SERVICES = {
   MATCH_SERVICE: 'MATCH_SERVICE',
   STATS_SERVICE: 'STATS_SERVICE',
   PLATFORM_SERVICE: 'PLATFORM_SERVICE',
-};
+} as const;

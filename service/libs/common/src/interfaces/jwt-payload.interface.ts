@@ -1,8 +1,10 @@
+// libs/common/src/interfaces/jwt-payload.interface.ts
 export interface JwtPayload {
-  sub: string; // user ID
+  sub: string;
   email: string;
   tenantId: string;
-  role: string; // 'admin' | 'owner' | 'player' | 'viewer'
-  iat?: number; // issued at
-  exp?: number; // expiration
+  roles: string[];
+  permissions: string[];
+  iat?: number;
+  exp?: number;
 }

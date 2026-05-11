@@ -14,10 +14,10 @@ const DEFAULT_TIMEOUT = 10000; // 10 seconds
 export class TimeoutInterceptor implements NestInterceptor {
   constructor(private readonly timeoutMs: number = DEFAULT_TIMEOUT) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
       timeout(this.timeoutMs),
-      catchError((err) => {
+      catchError((err: Error) => {
         if (err instanceof TimeoutError) {
           return throwError(
             () => new RequestTimeoutException('Request timed out'),

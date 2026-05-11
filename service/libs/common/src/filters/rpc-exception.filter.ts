@@ -9,6 +9,16 @@ import {
 import { RpcException } from '@nestjs/microservices';
 import { Response } from 'express';
 
+interface RpcError {
+  statusCode?: number;
+  status?: number;
+  message?: string;
+}
+
+function isRpcError(value: unknown): value is RpcError {
+  return typeof value === 'object' && value !== null;
+}
+
 @Catch()
 export class RpcExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('RpcExceptionFilter');
@@ -24,11 +34,10 @@ export class RpcExceptionFilter implements ExceptionFilter {
     if (exception instanceof RpcException) {
       const error = exception.getError();
 
-      if (typeof error === 'object' && error !== null) {
-        const err = error as Record<string, any>;
+      if (isRpcError(error)) {
         status =
-          err.statusCode || err.status || HttpStatus.INTERNAL_SERVER_ERROR;
-        message = err.message || 'Microservice error';
+          error.statusCode ?? error.status ?? HttpStatus.INTERNAL_SERVER_ERROR;
+        message = error.message ?? 'Microservice error';
       } else if (typeof error === 'string') {
         message = error;
       }
@@ -38,10 +47,12 @@ export class RpcExceptionFilter implements ExceptionFilter {
     else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const res = exception.getResponse();
-      message =
-        typeof res === 'string'
-          ? res
-          : (res as any).message || exception.message;
+
+      if (typeof res === 'string') {
+        message = res;
+      } else if (isRpcError(res)) {
+        message = res.message ?? exception.message;
+      }
     }
 
     // Handle unknown errors

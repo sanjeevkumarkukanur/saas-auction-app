@@ -1,14 +1,16 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
+
+interface RequestWithUser extends Request {
+  user?: JwtPayload;
+}
 
 export const CurrentUser = createParamDecorator(
   (data: keyof JwtPayload | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    const user = request.user as JwtPayload;
+    const request = ctx.switchToHttp().getRequest<RequestWithUser>();
+    const user = request.user;
 
-    // If a specific field is requested, return just that field
-    // Usage: @CurrentUser('sub') userId: string
-    // Usage: @CurrentUser() user: JwtPayload
     return data ? user?.[data] : user;
   },
 );
