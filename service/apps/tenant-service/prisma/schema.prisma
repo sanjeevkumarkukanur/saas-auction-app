@@ -1,0 +1,75 @@
+// apps/tenant-service/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/tenant-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  countryCode String?
+  phone       String?
+  website     String?
+  address     String?
+  city        String?
+  country     String?
+
+  planId String?
+
+  createdAt DateTime @default(now())
+
+  pages TenantPage[]
+
+  @@index([planId])
+}
+
+model TenantPage {
+  id        String   @id @default(uuid())
+  tenantId  String
+  pageKey   String
+  name      String
+  createdAt DateTime @default(now())
+
+  sections TenantSection[]
+
+  @@unique([tenantId, pageKey])
+  @@index([tenantId])
+}
+
+model TenantSection {
+  id           String @id @default(uuid())
+  tenantPageId String
+  key          String
+  title        String
+  order        Int
+  layoutJson   Json
+  stylesJson   Json
+
+  page   TenantPage    @relation(fields: [tenantPageId], references: [id], onDelete: Cascade)
+  fields TenantField[]
+
+  @@unique([tenantPageId, key])
+  @@index([tenantPageId])
+}
+
+model TenantField {
+  id              String @id @default(uuid())
+  tenantSectionId String
+  key             String
+  label           String
+  type            String
+  order           Int
+  uiJson          Json
+  stylesJson      Json
+  validationJson  Json
+
+  section TenantSection @relation(fields: [tenantSectionId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantSectionId, key])
+  @@index([tenantSectionId])
+}

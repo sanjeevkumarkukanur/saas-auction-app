@@ -1,0 +1,78 @@
+// apps/auth-service/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/auth-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String  @id @default(uuid())
+  email       String? @unique
+  password    String?
+  name        String?
+  countryCode String?
+  phone       String?
+
+  tenantId String?
+
+  roleId  String
+  roleRel Role   @relation(fields: [roleId], references: [id])
+
+  permissions UserPermission[]
+
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([roleId])
+  @@index([phone])
+}
+
+model Role {
+  id       String  @id @default(uuid())
+  name     String
+  tenantId String?
+
+  users           User[]
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model Permission {
+  id       String @id @default(uuid())
+  resource String
+  action   String
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String
+  permissionId String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model UserPermission {
+  id           String  @id @default(uuid())
+  userId       String
+  permissionId String
+  allowed      Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+  @@index([userId])
+  @@index([permissionId])
+}

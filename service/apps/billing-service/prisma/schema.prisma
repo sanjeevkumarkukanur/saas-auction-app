@@ -1,0 +1,141 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/billing-client"
+}
+
+model Plan {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  price       Int
+  currency    String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  limits          PlanLimit?
+  pages           PlanPage[]
+  planPermissions PlanPermission[]
+  subscriptions   Subscription[]
+}
+
+model PlanLimit {
+  id     String @id @default(uuid())
+  planId String @unique
+
+  maxPages    Int?
+  maxSections Int?
+  maxFields   Int?
+  maxUsers    Int?
+  maxTeams    Int?
+  maxPlayers  Int?
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model PlanPage {
+  id         String  @id @default(uuid())
+  planId     String
+  pageId     String   // comes from Platform Service
+  autoEnable Boolean  @default(true)
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, pageId])
+}
+
+model PlanPermission {
+  id           String @id @default(uuid())
+  planId       String
+  permissionId String   // comes from Platform Service
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, permissionId])
+}
+
+model Subscription {
+  id       String   @id @default(uuid())
+  tenantId String
+  planId   String
+
+  status SubscriptionStatus
+
+  stripeCustomerId String?
+  stripeSubId      String? @unique
+
+  trialEnd         DateTime?
+  currentPeriodEnd DateTime?
+
+  createdAt DateTime @default(now())
+
+  plan     Plan      @relation(fields: [planId], references: [id])
+  invoices Invoice[]
+
+  @@index([tenantId])
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  subscriptionId String
+
+  amount   Int
+  currency String
+
+  status InvoiceStatus
+
+  invoiceNumber String?
+  hostedUrl     String?
+
+  createdAt DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  payments     Payment[]
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  invoiceId String
+
+  amount   Int
+  currency String
+  status   PaymentStatus
+
+  provider      String
+  providerRefId String?
+
+  createdAt DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+}
+
+model BillingEvent {
+  id        String   @id @default(uuid())
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
+enum SubscriptionStatus {
+  active
+  trialing
+  past_due
+  canceled
+}
+
+enum InvoiceStatus {
+  draft
+  open
+  paid
+  void
+}
+
+enum PaymentStatus {
+  pending
+  succeeded
+  failed
+}
