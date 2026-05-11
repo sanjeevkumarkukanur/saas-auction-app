@@ -1,0 +1,35 @@
+export enum PlayerRole {
+  BATSMAN = 'BATSMAN',
+  BOWLER = 'BOWLER',
+  ALL_ROUNDER = 'ALL_ROUNDER',
+  WICKET_KEEPER = 'WICKET_KEEPER',
+}
+
+export enum PlayerSeasonStatus {
+  AVAILABLE = 'AVAILABLE',
+  SOLD = 'SOLD',
+  UNSOLD = 'UNSOLD'
+}
+
+export enum BattingStyle {
+  RIGHT_HAND_BAT = 'RIGHT_HAND_BAT',
+  LEFT_HAND_BAT = 'LEFT_HAND_BAT',
+}
+
+export enum BowlingStyle {
+  RIGHT_ARM_FAST = 'RIGHT_ARM_FAST',
+  LEFT_ARM_FAST = 'LEFT_ARM_FAST',
+  RIGHT_ARM_MEDIUM = 'RIGHT_ARM_MEDIUM',
+  LEFT_ARM_MEDIUM = 'LEFT_ARM_MEDIUM',
+  OFF_SPIN = 'OFF_SPIN',
+  LEG_SPIN = 'LEG_SPIN',
+  LEFT_ARM_SPIN = 'LEFT_ARM_SPIN',
+}
+
+export enum PlayerCategory {
+  MARQUEE = 'MARQUEE',
+  ICON = 'ICON',
+  CAPPED = 'CAPPED',
+  UNCAPPED = 'UNCAPPED',
+  EMERGING = 'EMERGING',
+}
