@@ -15,4 +15,4 @@ nest generate app game-service
 
 # Create shared library
 nest generate library common
-nest generate library radius
+nest generate library redis

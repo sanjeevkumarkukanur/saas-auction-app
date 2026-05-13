@@ -1,4 +1,4 @@
-export const ServicePorts = {
+export const SERVICEPORTS = {
   GATEWAY: 3000,
   AUTH: 4000,
   GAME: 4001,
@@ -18,11 +18,11 @@ export const ServicePorts = {
 } as const;
 
 export const Services = Object.fromEntries(
-  Object.entries(ServicePorts).map(([key, port]) => [
+  Object.entries(SERVICEPORTS).map(([key, port]) => [
     key,
     `http://localhost:${port}`,
   ]),
-) as Record<keyof typeof ServicePorts, string>;
+) as Record<keyof typeof SERVICEPORTS, string>;
 
 export const SERVICES = {
   GATEWAY_SERVICE: 'GATEWAY_SERVICE',

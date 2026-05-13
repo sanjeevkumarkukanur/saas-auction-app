@@ -8,6 +8,7 @@ import { OtpRepository } from './repositories/otp.repository';
 import { UsersRepository } from '../users/users.repository';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { RedisModule } from '@libs/redis';
+import { TenantsClientModule } from '@libs/common';
 
 @Module({
   imports: [
@@ -17,16 +18,7 @@ import { RedisModule } from '@libs/redis';
       secret: process.env.JWT_SECRET || 'default-secret',
       signOptions: { expiresIn: '7d' },
     }),
-    ClientsModule.register([
-      {
-        name: 'TENANT_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.TENANT_SERVICE_HOST || '127.0.0.1',
-          port: parseInt(process.env.TENANT_SERVICE_PORT || '3002'),
-        },
-      },
-    ]),
+    TenantsClientModule,
   ],
   controllers: [LoginController],
   providers: [LoginService, LoginRepository, OtpRepository, UsersRepository],

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ServicePorts, SERVICES } from '../constants';
+import { SERVICEPORTS, SERVICES } from '../constants';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { ServicePorts, SERVICES } from '../constants';
         transport: Transport.TCP,
         options: {
           host: process.env.PLAYER_HOST || 'localhost',
-          port: ServicePorts.PLAYER,
+          port: SERVICEPORTS.PLAYER,
         },
       },
     ]),

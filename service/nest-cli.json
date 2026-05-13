@@ -61,6 +61,15 @@
         "tsConfigPath": "apps/game-service/tsconfig.app.json"
       }
     },
+    "platform-service": {
+      "type": "application",
+      "root": "apps/platform-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/platform-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/platform-service/tsconfig.app.json"
+      }
+    },
     "player-service": {
       "type": "application",
       "root": "apps/player-service",

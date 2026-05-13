@@ -9,3 +9,4 @@ export * from './notifications';
 export * from './tenants';
 export * from './tournaments';
 export * from './auctions';
+export * from './platform';

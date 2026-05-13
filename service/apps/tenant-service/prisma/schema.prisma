@@ -1,7 +1,6 @@
-// apps/tenant-service/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/tenant-client"
+  output   = "../../../node_modules/@prisma/tenant-client"
 }
 
 datasource db {
@@ -18,10 +17,8 @@ model Tenant {
   address     String?
   city        String?
   country     String?
-
-  planId String?
-
-  createdAt DateTime @default(now())
+  planId      String?
+  createdAt   DateTime @default(now())
 
   pages TenantPage[]
 
@@ -35,6 +32,7 @@ model TenantPage {
   name      String
   createdAt DateTime @default(now())
 
+  tenant   Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)  // ← add
   sections TenantSection[]
 
   @@unique([tenantId, pageKey])
