@@ -1,5 +1,5 @@
+import { PaymentStatus } from '@libs/common/constants/billing.constants';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaymentStatus } from '../../../../prisma/generated/billing-client';
 
 export class CreatePaymentDto {
   @ApiProperty({
@@ -22,7 +22,7 @@ export class CreatePaymentDto {
 
   @ApiProperty({
     enum: PaymentStatus,
-    example: PaymentStatus.pending,
+    example: PaymentStatus.PENDING,
     description: 'Payment status',
   })
   status: PaymentStatus;

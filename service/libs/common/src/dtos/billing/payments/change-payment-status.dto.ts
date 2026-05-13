@@ -1,10 +1,10 @@
+import { PaymentStatus } from '@libs/common/constants/billing.constants';
 import { ApiProperty } from '@nestjs/swagger';
-import { PaymentStatus } from 'apps/billing-service/prisma/generated/billing-client';
 
 export class ChangePaymentStatusDto {
   @ApiProperty({
     enum: PaymentStatus,
-    example: PaymentStatus.succeeded,
+    example: PaymentStatus.SUCCESS,
   })
   status: PaymentStatus;
 }

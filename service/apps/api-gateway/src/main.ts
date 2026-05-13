@@ -8,11 +8,19 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
 import { ApiGatewayModule } from './api-gateway.module';
+import { RpcExceptionFilter } from '@libs/auth';
 
 async function bootstrap() {
   // Create App
   const app = await NestFactory.create(ApiGatewayModule);
-
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalFilters(new RpcExceptionFilter());
   // =========================
   // Security Middleware
   // =========================
@@ -49,14 +57,6 @@ async function bootstrap() {
   // =========================
   // Validation
   // =========================
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
 
   // =========================
   // Swagger

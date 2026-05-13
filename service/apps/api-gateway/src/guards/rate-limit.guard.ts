@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { RedisService } from 'libs/radius/src';
+import { RedisService } from '@libs/redis';
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {

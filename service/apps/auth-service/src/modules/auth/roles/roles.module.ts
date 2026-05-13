@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
+
 import { RolesService } from './roles.service';
 import { RolesRepository } from './roles.repository';
-import { UserPermissionsModule } from '../user-permissions/user-permissions.module';
-import { PrismaModule } from 'apps/auth-service/src/prisma/prisma.module';
 import { RolesController } from './roles.controller';
 
+import { UserPermissionsModule } from '../user-permissions/user-permissions.module';
+import { RedisModule } from '@libs/redis';
+import { PrismaModule } from '../../../prisma/prisma.module';
+
 @Module({
-  imports: [
-    PrismaModule,
-    UserPermissionsModule, // optional now, useful later for guards/validation
-  ],
+  imports: [PrismaModule, RedisModule, UserPermissionsModule],
   controllers: [RolesController],
   providers: [RolesService, RolesRepository],
-  exports: [RolesRepository], // export if User/Auth needs it later
+  exports: [RolesRepository],
 })
 export class RolesModule {}

@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto, UpdateUserDto } from '@app/common';
-import { CacheService } from '@server/redis';
+import { CacheService } from '@libs/redis';
+import { CreateUserDto, UpdateUserDto } from '@libs/common';
 
 export type CurrentUser = {
   id: string;
@@ -68,14 +68,14 @@ export class UsersService {
     userId: string,
     dto: UpdateUserDto,
   ) {
-    if (currentUser.role !== 'OWNER') {
-      throw new ForbiddenException('Only OWNER can update users');
+    if (currentUser.role !== 'OWNER' && currentUser.role !== 'ADMIN') {
+      throw new ForbiddenException('Only OWNER or ADMIN can update users');
     }
 
-    const users = await this.repo.findByTenant(currentUser.tenantId);
-    const exists = users.find((u) => u.id === userId);
+    // Use findById instead of fetching all users
+    const existingUser = await this.repo.findById(userId);
 
-    if (!exists) {
+    if (existingUser.tenantId !== currentUser.tenantId) {
       throw new NotFoundException('User not found in your tenant');
     }
 
@@ -91,11 +91,16 @@ export class UsersService {
       throw new ForbiddenException('Only OWNER can delete users');
     }
 
-    const users = await this.repo.findByTenant(currentUser.tenantId);
-    const exists = users.find((u) => u.id === userId);
+    // Use findById instead of fetching all users
+    const existingUser = await this.repo.findById(userId);
 
-    if (!exists) {
+    if (existingUser.tenantId !== currentUser.tenantId) {
       throw new NotFoundException('User not found in your tenant');
+    }
+
+    // Prevent owner from deleting themselves
+    if (userId === currentUser.id) {
+      throw new BadRequestException('Cannot delete your own account');
     }
 
     const deleted = await this.repo.deleteUser(userId);

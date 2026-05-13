@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PlanRepository } from './plans.repository';
-import { CacheService } from '@libs/radius';
+import { CacheService } from '@libs/redis';
 import { CreatePlanDto, UpdatePlanDto, UpdatePlanLimitDto } from '@libs/common';
 
 const CacheKeys = {

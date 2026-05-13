@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserPermissionsRepository } from './user-permissions.repository';
 import { PrismaService } from 'apps/auth-service/src/prisma/prisma.service';
-import { CacheService } from '@libs/radius';
+import { CacheService } from '@libs/redis';
 import { SetUserPermissionDto } from '@libs/common';
 
 const CacheKeys = {

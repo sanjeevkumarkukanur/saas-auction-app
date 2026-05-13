@@ -1,4 +1,4 @@
-import { RedisModule } from '@libs/radius';
+import { RedisModule } from '@libs/redis';
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { PlansModule } from './modules/plans/plans.module';

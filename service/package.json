@@ -25,7 +25,7 @@
     "start:auth:dev": "nest start auth-service --watch",
     "start:tenant": "nest start tenant-service",
     "start:tenant:dev": "nest start tenant-service --watch",
-     "start:billing": "nest start billing-service",
+    "start:billing": "nest start billing-service",
     "start:billing:dev": "nest start billing-service --watch",
     "start:team": "nest start team-service",
     "start:team:dev": "nest start team-service --watch",
@@ -85,6 +85,7 @@
     "class-validator": "^0.15.1",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
     "helmet": "^8.1.0",
     "ioredis": "^5.10.1",
     "joi": "^18.2.1",
@@ -156,6 +157,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
+      "^y/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^y/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^y/radius(|/.*)$": "<rootDir>/libs/radius/src/$1"
     }

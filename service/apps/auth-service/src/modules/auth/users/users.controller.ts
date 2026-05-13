@@ -1,46 +1,39 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { UsersService } from './users.service';
-import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { CreateUserDto, UpdateUserDto } from '@app/common';
+import { CreateUserDto, UpdateUserDto } from '@libs/common';
 
-@ApiTags('Users')
-@UseGuards(AuthGuard('jwt'))
-@Controller('users')
+@Controller()
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
-
-  // OWNER creates ADMIN/USER
-  @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.service.createUser(dto);
+  constructor(private readonly usersService: UsersService) {
+    console.log('🔥 UsersMsController LOADED');
   }
 
-  // List users in tenant
-  @Get()
-  list(@Req() req) {
-    return this.service.listUsers(req.user);
+  @MessagePattern({ cmd: 'users.create' })
+  create(data: { dto: CreateUserDto }) {
+    return this.usersService.createUser(data.dto);
   }
 
-  // OWNER updates user
-  @Patch(':id')
-  update(@Req() req, @Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.service.updateUser(req.user, id, dto);
+  @MessagePattern({ cmd: 'users.list' })
+  list(data: { currentUser: any }) {
+    console.log('MS received data =', data);
+
+    if (!data || !data.currentUser) {
+      throw new Error('currentUser not provided to users.list');
+    }
+
+    return this.usersService.listUsers(data.currentUser);
   }
 
-  // OWNER deletes user
-  @Delete(':id')
-  remove(@Req() req, @Param('id') id: string) {
-    return this.service.deleteUser(req.user, id);
+  @MessagePattern({ cmd: 'users.update' })
+  update(data: { currentUser: any; userId: string; dto: UpdateUserDto }) {
+    const { currentUser, userId, dto } = data;
+    return this.usersService.updateUser(currentUser, userId, dto);
+  }
+
+  @MessagePattern({ cmd: 'users.delete' })
+  delete(data: { currentUser: any; userId: string }) {
+    const { currentUser, userId } = data;
+    return this.usersService.deleteUser(currentUser, userId);
   }
 }

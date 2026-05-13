@@ -3,7 +3,7 @@ import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from 'apps/auth-service/prisma/generated/auth-client';
+import { PrismaClient } from '@prisma/auth-client';
 
 @Injectable()
 export class PrismaService

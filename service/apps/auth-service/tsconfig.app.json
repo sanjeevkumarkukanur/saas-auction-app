@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": false,
+    // REMOVE "baseUrl": "./" entirely
     "outDir": "../../dist/apps/auth-service"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "prisma/generated/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

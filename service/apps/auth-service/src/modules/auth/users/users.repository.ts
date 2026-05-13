@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from 'apps/auth-service/prisma/generated/auth-client';
-import { PrismaService } from 'apps/auth-service/src/prisma/prisma.service';
+import { Prisma } from '@prisma/auth-client';
+import { PrismaService } from '../../../prisma/prisma.service';
 
-export type UserWithTenant = Prisma.UserGetPayload<{
-  include: { tenant: true; roleRel: true };
+export type UserWithRole = Prisma.UserGetPayload<{
+  include: { roleRel: true };
 }>;
 
 export type AppRole = 'OWNER' | 'ADMIN' | 'USER' | 'PLAYER' | 'TEAM_OWNER';
@@ -14,6 +14,7 @@ export type UserListItem = {
   name: string | null;
   phone: string | null;
   role: string;
+  roleId: string;
   tenantId: string | null;
   createdAt: Date;
 };
@@ -22,8 +23,7 @@ export type UserListItem = {
 export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByEmail(email: string): Promise<UserWithTenant | null> {
-    console.log('REPO EMAIL:', email);
+  async findByEmail(email: string): Promise<UserWithRole | null> {
     if (!email) {
       throw new Error('Email is undefined in repo');
     }
@@ -31,33 +31,27 @@ export class UsersRepository {
     return this.prisma.user.findUnique({
       where: { email },
       include: {
-        tenant: true,
         roleRel: true,
       },
     });
   }
 
   async findPlayerByPhone(
+    countryCode: string,
     phone: string,
-    tenantId: string,
-  ): Promise<UserWithTenant | null> {
+  ): Promise<UserWithRole | null> {
     return this.prisma.user.findFirst({
       where: {
+        countryCode,
         phone,
-        tenantId,
-        roleRel: {
-          name: 'PLAYER',
-        },
+        roleRel: { name: 'PLAYER' },
       },
-      include: {
-        tenant: true,
-        roleRel: true,
-      },
+      include: { roleRel: true },
     });
   }
 
   async ensureDefaultRoles(tenantId: string) {
-    const roles = ['OWNER', 'ADMIN', 'MANAGER'];
+    const roles = ['OWNER', 'ADMIN', 'MANAGER', 'USER', 'PLAYER', 'TEAM_OWNER'];
 
     for (const roleName of roles) {
       await this.prisma.role.upsert({
@@ -96,26 +90,32 @@ export class UsersRepository {
   }
 
   async createPlayer(data: {
+    countryCode: string;
     phone: string;
-    tenantId: string;
     role: 'PLAYER';
     name?: string;
-  }): Promise<UserWithTenant> {
-    const roleRow = await this.getRoleRow(data.tenantId, data.role);
+  }): Promise<UserWithRole> {
+    let playerRole = await this.prisma.role.findFirst({
+      where: { name: 'PLAYER', tenantId: null },
+    });
+
+    if (!playerRole) {
+      playerRole = await this.prisma.role.create({
+        data: { name: 'PLAYER', tenantId: null },
+      });
+    }
 
     return this.prisma.user.create({
       data: {
+        countryCode: data.countryCode,
         phone: data.phone,
-        tenantId: data.tenantId,
         name: data.name ?? null,
         email: null,
         password: null,
-        roleId: roleRow.id,
+        tenantId: null,
+        roleId: playerRole.id,
       },
-      include: {
-        tenant: true,
-        roleRel: true,
-      },
+      include: { roleRel: true },
     });
   }
 
@@ -149,6 +149,7 @@ export class UsersRepository {
       name: user.name,
       phone: user.phone,
       role: user.roleRel.name,
+      roleId: user.roleId,
       tenantId: user.tenantId,
       createdAt: user.createdAt,
     };
@@ -169,12 +170,13 @@ export class UsersRepository {
       name: user.name,
       phone: user.phone,
       role: user.roleRel.name,
+      roleId: user.roleId,
       tenantId: user.tenantId,
       createdAt: user.createdAt,
     }));
   }
 
-  async findById(userId: string) {
+  async findById(userId: string): Promise<UserListItem> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -208,10 +210,7 @@ export class UsersRepository {
   ): Promise<UserListItem> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        tenantId: true,
-      },
+      select: { id: true, tenantId: true },
     });
 
     if (!existingUser) {
@@ -224,7 +223,6 @@ export class UsersRepository {
       if (!existingUser.tenantId) {
         throw new NotFoundException(`Tenant not found for user ${userId}`);
       }
-
       const roleRow = await this.getRoleRow(existingUser.tenantId, data.role);
       roleId = roleRow.id;
     }
@@ -247,6 +245,7 @@ export class UsersRepository {
       name: user.name,
       phone: user.phone,
       role: user.roleRel.name,
+      roleId: user.roleId,
       tenantId: user.tenantId,
       createdAt: user.createdAt,
     };
@@ -254,14 +253,11 @@ export class UsersRepository {
 
   async findRoleByName(tenantId: string, name: string) {
     return this.prisma.role.findFirst({
-      where: {
-        tenantId,
-        name,
-      },
+      where: { tenantId, name },
     });
   }
 
-  deleteUser(userId: string): Promise<{ id: string }> {
+  async deleteUser(userId: string): Promise<{ id: string }> {
     return this.prisma.user.delete({
       where: { id: userId },
       select: { id: true },

@@ -1,7 +1,7 @@
 // apps/auth-service/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/auth-client"
+  output = "../../../node_modules/@prisma/auth-client"
 }
 
 datasource db {
@@ -16,18 +16,20 @@ model User {
   countryCode String?
   phone       String?
 
-  tenantId String?
+  tenantId String?  // References tenant in tenant-service DB — no Prisma relation
 
   roleId  String
-  roleRel Role   @relation(fields: [roleId], references: [id])
+  roleRel Role @relation(fields: [roleId], references: [id])
 
   permissions UserPermission[]
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt        // good to have for tracking
 
   @@index([tenantId])
   @@index([roleId])
   @@index([phone])
+  @@index([email])
 }
 
 model Role {
@@ -49,6 +51,9 @@ model Permission {
   resource String
   action   String
 
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
   @@unique([resource, action])
 }
 
@@ -57,7 +62,8 @@ model RolePermission {
   roleId       String
   permissionId String
 
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
   @@index([roleId])
@@ -70,7 +76,8 @@ model UserPermission {
   permissionId String
   allowed      Boolean @default(true)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
   @@index([userId])

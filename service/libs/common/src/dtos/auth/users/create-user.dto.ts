@@ -2,11 +2,10 @@ import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsIn, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-
   @ApiHideProperty()
-   id?: string;
+  id?: string;
 
-   @ApiProperty()
+  @ApiProperty()
   @IsString()
   tenantId!: string;
   @ApiProperty({ example: 'abc@gmail.com' })

@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { InvoiceStatus } from '../../../../prisma/generated/billing-client';
-
+import { InvoiceStatus } from '../../../constants/billing.constants';
 export class CreateInvoiceDto {
   @ApiProperty({
     example: 'subscription-uuid',
@@ -22,7 +21,7 @@ export class CreateInvoiceDto {
 
   @ApiProperty({
     enum: InvoiceStatus,
-    example: InvoiceStatus.open,
+    example: InvoiceStatus.DRAFT,
     description: 'Invoice status',
   })
   status: InvoiceStatus;

@@ -1,16 +1,19 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 import * as bcrypt from 'bcrypt';
-import { OtpRepository } from './repositories/otp.repository';
 import { LoginDto, SendOtpDto, VerifyOtpDto } from '@libs/common';
+import { CacheService } from '@libs/redis';
+import { OtpRepository } from './repositories/otp.repository';
 import { LoginRepository } from './login.repository';
-import { CacheService } from '@libs/radius';
-import { UserWithTenant } from '../users/users.repository';
+import { UserWithRole } from '../users/users.repository';
 
 const CacheKeys = {
   userByEmail: (email: string) => `auth:user:email:${email}`,
-  playerByPhone: (tenantId: string, phone: string) =>
-    `auth:player:${tenantId}:${phone}`,
+  playerByPhone: (countryCode: string, phone: string) =>
+    `auth:player:phone:${countryCode}:${phone}`,
+  tenantById: (tenantId: string) => `auth:tenant:${tenantId}`,
 };
 
 @Injectable()
@@ -20,78 +23,116 @@ export class LoginService {
     private readonly otpRepo: OtpRepository,
     private readonly jwtService: JwtService,
     private readonly cache: CacheService,
+    @Inject('TENANT_SERVICE')
+    private readonly tenantClient: ClientProxy,
   ) {}
 
+  // ──── OWNER / ADMIN / STAFF LOGIN (email + password) ────
   async loginWithPassword(dto: LoginDto) {
-    const cacheKey = CacheKeys.userByEmail(dto.email);
-    let user = await this.cache.get<UserWithTenant>(cacheKey);
-    if (!user) {
-      user = await this.authRepo.findUserByEmail(dto.email);
+    try {
+      const cacheKey = CacheKeys.userByEmail(dto.email);
+      let user = await this.cache.get<UserWithRole>(cacheKey);
 
-      if (user) {
-        await this.cache.set(cacheKey, user, 300);
+      if (!user) {
+        user = await this.authRepo.findUserByEmail(dto.email);
+        if (user) {
+          await this.cache.set(cacheKey, user, 300);
+        }
       }
-    }
 
-    if (!user || !user.password) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+      if (!user || !user.password) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    const ok = await bcrypt.compare(dto.password, user.password);
-    if (!ok) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+      const ok = await bcrypt.compare(dto.password, user.password);
+      if (!ok) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    return this.signToken(user);
+      return this.signStaffToken(user);
+    } catch (error: any) {
+      console.error('loginWithPassword error:', error);
+      throw new RpcException({
+        status: 'error',
+        message: error?.message || 'Login failed',
+      });
+    }
   }
 
+  // ──── PLAYER LOGIN (phone + OTP) ────
   async sendPlayerOtp(dto: SendOtpDto) {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const key = `${dto.tenantId}:${dto.phone}`;
+    try {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const key = `otp:${dto.countryCode}:${dto.phone}`;
 
-    await this.otpRepo.save(key, otp, 5 * 60 * 1000);
+      await this.otpRepo.save(key, otp, 5 * 60 * 1000);
+      console.log('OTP for', dto.countryCode, dto.phone, 'is', otp);
 
-    console.log('OTP for', dto.phone, 'is', otp);
-
-    return { success: true, message: 'OTP sent successfully' };
+      return { success: true, message: 'OTP sent successfully' };
+    } catch (error: any) {
+      console.error('sendPlayerOtp error:', error);
+      throw new RpcException({
+        status: 'error',
+        message: error?.message || 'Failed to send OTP',
+      });
+    }
   }
 
   async verifyPlayerOtp(dto: VerifyOtpDto) {
-    const key = `${dto.tenantId}:${dto.phone}`;
-    const valid = await this.otpRepo.isValid(key, dto.otp);
+    try {
+      const key = `otp:${dto.countryCode}:${dto.phone}`;
+      const valid = await this.otpRepo.isValid(key, dto.otp);
 
-    if (!valid) {
-      throw new UnauthorizedException('Invalid or expired OTP');
-    }
-
-    await this.otpRepo.delete(key);
-
-    const cacheKey = CacheKeys.playerByPhone(dto.tenantId, dto.phone);
-
-    let player = await this.cache.get<UserWithTenant>(cacheKey);
-
-    if (!player) {
-      player = await this.authRepo.findPlayerByPhone(dto.phone, dto.tenantId);
-
-      if (!player) {
-        player = await this.authRepo.createPlayer({
-          phone: dto.phone,
-          tenantId: dto.tenantId,
-          role: 'PLAYER',
-        });
+      if (!valid) {
+        throw new UnauthorizedException('Invalid or expired OTP');
       }
 
-      await this.cache.set(cacheKey, player, 300);
-    }
+      await this.otpRepo.delete(key);
 
-    return this.signToken(player);
+      const cacheKey = CacheKeys.playerByPhone(dto.countryCode, dto.phone);
+      let player = await this.cache.get<UserWithRole>(cacheKey);
+
+      if (!player) {
+        player = await this.authRepo.findPlayerByPhone(
+          dto.countryCode,
+          dto.phone,
+        );
+
+        if (!player) {
+          player = await this.authRepo.createPlayer({
+            countryCode: dto.countryCode,
+            phone: dto.phone,
+            role: 'PLAYER',
+          });
+        }
+
+        await this.cache.set(cacheKey, player, 300);
+      }
+
+      return this.signPlayerToken(player);
+    } catch (error: any) {
+      console.error('verifyPlayerOtp error:', error);
+      throw new RpcException({
+        status: 'error',
+        message: error?.message || 'OTP verification failed',
+      });
+    }
   }
 
-  private signToken(user: UserWithTenant) {
+  // ──── TOKEN SIGNING ────
+
+  private async signStaffToken(user: UserWithRole) {
+    let planId: string | null = null;
+
+    if (user.tenantId) {
+      const tenant = await this.getTenant(user.tenantId);
+      planId = tenant?.planId ?? null;
+    }
+
     const payload = {
       sub: user.id,
       tenantId: user.tenantId,
-      planId: user.tenant?.planId ?? null,
+      planId,
       role: user.roleRel.name,
     };
 
@@ -105,8 +146,52 @@ export class LoginService {
         phone: user.phone ?? null,
         role: user.roleRel.name,
         tenantId: user.tenantId ?? null,
-        planId: user.tenant?.planId ?? null,
+        planId,
       },
     };
+  }
+
+  private signPlayerToken(player: UserWithRole) {
+    const payload = {
+      sub: player.id,
+      role: 'PLAYER',
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      token,
+      user: {
+        id: player.id,
+        countryCode: player.countryCode ?? null,
+        phone: player.phone ?? null,
+        name: player.name ?? null,
+        role: 'PLAYER',
+      },
+    };
+  }
+
+  // ──── HELPERS ────
+
+  private async getTenant(
+    tenantId: string,
+  ): Promise<{ planId: string | null } | null> {
+    const cacheKey = CacheKeys.tenantById(tenantId);
+    let tenant = await this.cache.get<{ planId: string | null }>(cacheKey);
+
+    if (tenant) return tenant;
+
+    try {
+      tenant = await firstValueFrom(
+        this.tenantClient.send({ cmd: 'tenant.findById' }, { id: tenantId }),
+      );
+      if (tenant) {
+        await this.cache.set(cacheKey, tenant, 600);
+      }
+      return tenant;
+    } catch (error) {
+      console.error('getTenant error:', error);
+      return null;
+    }
   }
 }
