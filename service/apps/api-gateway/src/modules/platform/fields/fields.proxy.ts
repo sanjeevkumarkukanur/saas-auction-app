@@ -1,9 +1,7 @@
+import { CreateFieldDto, UpdateFieldDto } from '@libs/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { CreateFieldDto } from './dto/create-fields.dto';
-import { UpdateFieldDto } from './dto/update-fields.dto';
-
 @Injectable()
 export class FieldsProxy {
   constructor(

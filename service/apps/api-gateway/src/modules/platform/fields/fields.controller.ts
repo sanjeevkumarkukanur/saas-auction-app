@@ -1,8 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { CreateFieldDto } from './dto/create-fields.dto';
-import { UpdateFieldDto } from './dto/update-fields.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FieldsProxy } from './fields.proxy';
+import { CreateFieldDto, UpdateFieldDto } from '@libs/common';
 
 @ApiTags('Master Fields')
 @Controller('master/fields')

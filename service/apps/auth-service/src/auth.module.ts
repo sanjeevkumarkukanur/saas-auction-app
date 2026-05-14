@@ -10,7 +10,6 @@ import { RolesModule } from './modules/auth/roles/roles.module';
       isGlobal: true,
       envFilePath: 'apps/auth-service/.env',
     }),
-
     LoginModule,
     RolesModule,
   ],

@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../../../node_modules/@prisma/games-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+//////////////////////////////
+// GAME (MASTER)
+//////////////////////////////
+
+model Game {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  name      String
+  tag       String?
+  description String?
+  icon      String?
+  route     String?
+  isActive  Boolean  @default(true)
+
+  tenantGames TenantGame[]
+
+  // ✅ ADD THESE BACK
+  formats    GameFormat[]
+  roles      GameRole[]
+  categories GameCategory[]
+  rules      GameRuleTemplate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////
+// TENANT GAME (MAPPING)
+//////////////////////////////
+
+model TenantGame {
+  id        String @id @default(uuid())
+
+  tenantId  String   // 🔥 just keep as plain field
+  gameId    String
+
+  isActive   Boolean @default(true)
+  customName String?
+
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  ruleOverrides   TenantGameRule[]
+  formatOverrides TenantGameFormat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, gameId])
+  @@index([tenantId])
+  @@index([gameId])
+}
+
+//////////////////////////////
+// GAME CONFIG (MASTER)
+//////////////////////////////
+
+model GameFormat {
+  id     String @id @default(uuid())
+  gameId String
+
+  key    String
+  name   String
+  isActive Boolean @default(true)
+
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  tenantOverrides TenantGameFormat[]
+
+  @@unique([gameId, key])
+}
+
+model GameRole {
+  id     String @id @default(uuid())
+  gameId String
+
+  key    String
+  name   String
+  isActive Boolean @default(true)
+
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, key])
+}
+
+model GameCategory {
+  id     String @id @default(uuid())
+  gameId String
+
+  key    String
+  name   String
+  isActive Boolean @default(true)
+
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, key])
+}
+
+model GameRuleTemplate {
+  id           String @id @default(uuid())
+  gameId       String
+
+  key          String
+  valueType    String   // "number", "string", "boolean", "json"
+  defaultValue String
+  description  String?
+  isActive     Boolean @default(true)
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  tenantOverrides TenantGameRule[]
+
+  @@unique([gameId, key])
+}
+
+//////////////////////////////
+// TENANT OVERRIDES (ADVANCED)
+//////////////////////////////
+
+model TenantGameRule {
+  id            String @id @default(uuid())
+
+  tenantGameId  String
+  ruleId        String
+  value         String   // override value
+
+  tenantGame TenantGame      @relation(fields: [tenantGameId], references: [id], onDelete: Cascade)
+  rule       GameRuleTemplate @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantGameId, ruleId])
+}
+
+model TenantGameFormat {
+  id            String @id @default(uuid())
+
+  tenantGameId  String
+  formatId      String
+  isEnabled     Boolean @default(true)
+
+  tenantGame TenantGame @relation(fields: [tenantGameId], references: [id], onDelete: Cascade)
+  format     GameFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantGameId, formatId])
+}

@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { PlatformModule } from './modules/platform/platform.module';
 import { TeamsModule } from './modules/team/teams.module';
+import { GamesModule } from './modules/games/games.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TeamsModule } from './modules/team/teams.module';
     }),
     AuthModule,
     PlatformModule,
+    GamesModule,
     TenantsModule,
     TeamsModule,
   ],
