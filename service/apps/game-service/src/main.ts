@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { SERVICEPORTS } from '@libs/common';
+import { SERVICE_PORTS } from '@libs/common';
 import { GameServiceModule } from './game-service.module';
 
 async function bootstrap() {
@@ -11,13 +11,13 @@ async function bootstrap() {
       options: {
         host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
 
-        port: Number(SERVICEPORTS.GAME) || 4000,
+        port: Number(SERVICE_PORTS.GAME) || 4000,
       },
     },
   );
   await app.listen();
   console.log(
-    `✅ Game Service running on TCP port ${SERVICEPORTS.GAME || 4000}`,
+    `✅ Game Service running on TCP port ${SERVICE_PORTS.GAME || 4000}`,
   );
 }
 

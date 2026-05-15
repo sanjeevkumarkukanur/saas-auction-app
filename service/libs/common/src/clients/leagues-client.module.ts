@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { SERVICEPORTS, SERVICES } from '../constants';
+import { SERVICE_PORTS, SERVICES } from '../constants';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { SERVICEPORTS, SERVICES } from '../constants';
         transport: Transport.TCP,
         options: {
           host: process.env.LEAGUE_HOST || 'localhost',
-          port: SERVICEPORTS.LEAGUE,
+          port: SERVICE_PORTS.LEAGUE,
         },
       },
     ]),

@@ -1,5 +1,8 @@
-export const SERVICEPORTS = {
-  GATEWAY: 3000,
+// ── Gateway ───────────────────────────────────
+export const GATEWAY_PORT = 3000;
+
+// ── TCP services (sync — need immediate response) ──
+export const SERVICE_PORTS = {
   AUTH: 4000,
   GAME: 4001,
   LEAGUE: 4002,
@@ -8,8 +11,6 @@ export const SERVICEPORTS = {
   AUCTION: 4005,
   TENANT: 4006,
   BILLING: 4007,
-  NOTIFICATION: 4008,
-  REALTIME: 4009,
   FIELD: 4010,
   TOURNAMENT: 4011,
   MATCH: 4012,
@@ -17,15 +18,15 @@ export const SERVICEPORTS = {
   PLATFORM: 4014,
 } as const;
 
-export const Services = Object.fromEntries(
-  Object.entries(SERVICEPORTS).map(([key, port]) => [
-    key,
-    `http://localhost:${port}`,
-  ]),
-) as Record<keyof typeof SERVICEPORTS, string>;
+// ── RMQ services (async — background/events) ──
+export const SERVICE_QUEUES = {
+  NOTIFICATION_SERVICE: 'notification_queue', // ← send emails/push
+  REALTIME_SERVICE: 'realtime_queue', // ← websocket events
+} as const;
 
+// ── service injection tokens ──────────────────
 export const SERVICES = {
-  GATEWAY_SERVICE: 'GATEWAY_SERVICE',
+  // TCP
   AUTH_SERVICE: 'AUTH_SERVICE',
   GAME_SERVICE: 'GAME_SERVICE',
   LEAGUE_SERVICE: 'LEAGUE_SERVICE',
@@ -34,11 +35,17 @@ export const SERVICES = {
   AUCTION_SERVICE: 'AUCTION_SERVICE',
   TENANT_SERVICE: 'TENANT_SERVICE',
   BILLING_SERVICE: 'BILLING_SERVICE',
-  NOTIFICATION_SERVICE: 'NOTIFICATION_SERVICE',
-  REALTIME_SERVICE: 'REALTIME_SERVICE',
   FIELD_SERVICE: 'FIELD_SERVICE',
   TOURNAMENT_SERVICE: 'TOURNAMENT_SERVICE',
   MATCH_SERVICE: 'MATCH_SERVICE',
   STATS_SERVICE: 'STATS_SERVICE',
   PLATFORM_SERVICE: 'PLATFORM_SERVICE',
+
+  // RMQ
+  NOTIFICATION_SERVICE: 'NOTIFICATION_SERVICE',
+  REALTIME_SERVICE: 'REALTIME_SERVICE',
 } as const;
+
+export type ServiceName = keyof typeof SERVICES;
+export type ServicePort = (typeof SERVICE_PORTS)[keyof typeof SERVICE_PORTS];
+export type ServiceQueue = (typeof SERVICE_QUEUES)[keyof typeof SERVICE_QUEUES];

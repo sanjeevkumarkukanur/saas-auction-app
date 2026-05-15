@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { SERVICEPORTS, SERVICES } from '../constants';
+import { SERVICE_PORTS, SERVICES } from '../constants';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { SERVICEPORTS, SERVICES } from '../constants';
 
         options: {
           host: process.env.AUTH_HOST || 'localhost',
-          port: SERVICEPORTS.AUTH,
+          port: SERVICE_PORTS.AUTH,
         },
       },
     ]),

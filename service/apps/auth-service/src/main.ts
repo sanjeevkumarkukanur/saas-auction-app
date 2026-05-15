@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 import { AuthModule } from './auth.module';
-import { SERVICEPORTS } from '@libs/common';
+import { SERVICE_PORTS } from '@libs/common';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -12,7 +12,7 @@ async function bootstrap() {
       options: {
         host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
 
-        port: Number(SERVICEPORTS.AUTH) || 4000,
+        port: Number(SERVICE_PORTS.AUTH) || 4000,
       },
     },
   );
@@ -20,7 +20,7 @@ async function bootstrap() {
   await app.listen();
 
   console.log(
-    `✅ Auth Service running on TCP port ${SERVICEPORTS.AUTH || 4000}`,
+    `✅ Auth Service running on TCP port ${SERVICE_PORTS.AUTH || 4000}`,
   );
 }
 
