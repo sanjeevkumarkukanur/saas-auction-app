@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
+
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { SERVICE_PORTS, SERVICES } from '../constants';
+
+import { SERVICE_CONFIG, SERVICES } from '@libs/common';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: SERVICES.PLATFORM_SERVICE,
+        name: SERVICES.PLAYER_SERVICE,
+
         transport: Transport.TCP,
+
         options: {
-          host: process.env.PLATFORM_HOST || 'localhost',
-          port: SERVICE_PORTS.PLATFORM,
+          host: SERVICE_CONFIG.PLAYER_SERVICE.host,
+
+          port: SERVICE_CONFIG.PLAYER_SERVICE.port,
         },
       },
     ]),
   ],
+
   exports: [ClientsModule],
 })
-export class PlatformClientModule {}
+export class MatchClientModule {}

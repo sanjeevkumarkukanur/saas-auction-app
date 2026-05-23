@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { SERVICE_PORTS, SERVICES } from '../constants';
+import { SERVICE_PORTS, SERVICES } from '../../../auth/src/config';
 
 @Module({
   imports: [

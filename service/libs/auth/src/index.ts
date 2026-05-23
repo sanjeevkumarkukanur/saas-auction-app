@@ -21,3 +21,6 @@ export * from './decorators';
 
 // Helper
 export * from './helpers';
+
+// Config
+export * from './config';

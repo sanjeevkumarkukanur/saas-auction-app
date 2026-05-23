@@ -8,11 +8,21 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
+interface RpcErrorShape {
+  message?: string;
+  statusCode?: number;
+  error?: string | RpcErrorShape;
+}
+
+function isRpcError(value: unknown): value is RpcErrorShape {
+  return typeof value === 'object' && value !== null;
+}
+
 @Catch()
 export class RpcExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('RpcExceptionFilter');
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
@@ -26,27 +36,20 @@ export class RpcExceptionFilter implements ExceptionFilter {
 
       if (typeof res === 'string') {
         message = res;
-      } else if (typeof res === 'object' && res !== null) {
-        message = (res as any).message ?? exception.message;
+      } else if (isRpcError(res)) {
+        message = res.message ?? exception.message;
       }
     }
 
     // Handle RPC errors (arrive as plain objects from microservices)
-    else if (typeof exception === 'object' && exception !== null) {
-      // RPC errors come in different shapes:
-      // { status: 'error', message: '...' }
-      // { statusCode: 401, message: '...' }
-      // { error: { statusCode: 401, message: '...' } }
+    else if (isRpcError(exception)) {
+      const error =
+        typeof exception.error === 'object' && isRpcError(exception.error)
+          ? exception.error
+          : exception;
 
-      const error = exception.error || exception;
-
-      if (typeof error === 'object') {
-        message = error.message || message;
-        status = error.statusCode || this.mapMessageToStatus(error.message);
-      } else if (typeof error === 'string') {
-        message = error;
-        status = this.mapMessageToStatus(error);
-      }
+      message = error.message ?? message;
+      status = error.statusCode ?? this.mapMessageToStatus(error.message);
     }
 
     // Handle plain Error instances

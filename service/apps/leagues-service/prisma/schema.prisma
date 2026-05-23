@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "./generated/league-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model League {
+  id            String   @id @default(uuid())
+  name          String
+  tenantId      String
+  tenantGameId        String
+
+  status        LeagueStatus @default(DRAFT)
+  description   String?
+  isActive  Boolean  @default(true)
+
+  seasons       Season[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([tenantGameId])
+}
+
+model Season {
+  id        String       @id @default(uuid())
+  name      String
+  year      Int
+
+  // 🔥 RELATIONS
+  leagueId  String
+  league    League       @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+
+  tenantGameId    String
+  
+  // 🔥 Team Config
+  teamMaxTeams            Int
+  teamMinPlayers          Int
+  teamMaxPlayers          Int
+  teamForeignPlayerLimit  Int?
+
+  // 🔥 Financial
+  financialTotalBudget              Float
+  financialPurseCarryOverEnabled    Boolean @default(false)
+
+  // 🔥 Auction Config
+  auctionDate             DateTime?
+  auctionBidIncrement     Int?
+  auctionBidTimeSeconds   Int?
+  auctionAutoBidEnabled   Boolean @default(false)
+  auctionUndoBidEnabled   Boolean @default(false)
+
+  // 🔥 Features
+  featurePublicBroadcast  Boolean @default(false)
+  featureLiveLeaderboard  Boolean @default(false)
+  featureRealTimeStats    Boolean @default(false)
+
+  // 🔥 Status
+  status        SeasonStatus @default(UPCOMING)
+  isActive      Boolean      @default(true)
+
+  // 🔥 Timeline (optional)
+  registrationStart DateTime?
+  registrationEnd   DateTime?
+  auctionStart      DateTime?
+  auctionEnd        DateTime?
+  seasonStart       DateTime?
+  seasonEnd         DateTime?
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([leagueId])
+  @@index([tenantGameId])
+  @@index([status])
+  @@unique([leagueId, year])
+}
+
+enum LeagueStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum SeasonStatus {
+  UPCOMING
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  AUCTION_LIVE
+  LIVE
+  COMPLETED
+  CANCELLED
+}

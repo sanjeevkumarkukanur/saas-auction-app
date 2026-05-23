@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/match-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Match {
+  id            String        @id @default(uuid())
+  tournamentId  String
+  stageId       String?
+  fixtureId     String?       // link to tournament-service fixture
+  homeTeamId    String
+  awayTeamId    String
+
+  status        MatchStatus   @default(SCHEDULED)
+
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  winnerTeamId  String?
+  winType       WinType?
+  winMargin     Int?
+
+  version       Int           @default(1) // optimistic locking
+
+  scores        TeamScore[]
+  timeline      MatchTimeline[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([tournamentId])
+  @@index([status])
+}
+
+model TeamScore {
+  id        String   @id @default(uuid())
+  matchId   String
+  teamId    String
+
+  innings   Int      // 🔥 ADD THIS
+
+  runs      Int      @default(0)
+  wickets   Int      @default(0)
+  overs     Float    @default(0)
+
+  extras    Int      @default(0)
+
+  isFinal    Boolean @default(false)
+  isApproved Boolean @default(false)
+
+  match     Match    @relation(fields: [matchId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([matchId, teamId, innings]) // 🔥 FIX
+  @@index([matchId])
+}
+
+model MatchTimeline {
+  id        String        @id @default(uuid())
+  matchId   String
+
+  type      TimelineType
+  teamId    String?
+  playerId  String?
+
+  over      Int?
+  ball      Int?
+
+  description String?
+
+  metadata  Json?
+
+  match     Match         @relation(fields: [matchId], references: [id])
+
+  createdAt DateTime      @default(now())
+
+  @@index([matchId])
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  INNINGS_BREAK
+  COMPLETED
+  ABANDONED
+  CANCELLED
+}
+
+enum WinType {
+  RUNS
+  WICKETS
+  TIE
+  SUPER_OVER
+  NO_RESULT
+}
+
+enum TimelineType {
+  MATCH_START
+  OVER_COMPLETE
+  FOUR
+  SIX
+  WICKET
+  RUN
+  EXTRA
+  INNINGS_END
+  MATCH_END
+}

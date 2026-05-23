@@ -61,6 +61,24 @@
         "tsConfigPath": "apps/game-service/tsconfig.app.json"
       }
     },
+    "leagues-service": {
+      "type": "application",
+      "root": "apps/leagues-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/leagues-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/leagues-service/tsconfig.app.json"
+      }
+    },
+    "match-service": {
+      "type": "application",
+      "root": "apps/match-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/match-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/match-service/tsconfig.app.json"
+      }
+    },
     "platform-service": {
       "type": "application",
       "root": "apps/platform-service",
@@ -77,6 +95,15 @@
       "sourceRoot": "apps/player-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/player-service/tsconfig.app.json"
+      }
+    },
+    "players-service": {
+      "type": "application",
+      "root": "apps/players-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/players-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/players-service/tsconfig.app.json"
       }
     },
     "radius": {

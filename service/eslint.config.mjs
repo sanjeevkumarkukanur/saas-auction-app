@@ -24,51 +24,20 @@ export default tseslint.config(
       },
     },
   },
-   {
-  rules: {
-    // Allow flexible enterprise coding
-    '@typescript-eslint/no-explicit-any': 'off',
-
-    // Async handling
-    '@typescript-eslint/no-floating-promises': 'warn',
-
-    // NestJS + Express middleware often triggers these
-    '@typescript-eslint/no-unsafe-argument': 'off',
-    '@typescript-eslint/no-unsafe-call': 'off',
-    '@typescript-eslint/no-unsafe-member-access': 'off',
-    '@typescript-eslint/no-unsafe-assignment': 'off',
-    '@typescript-eslint/no-unsafe-return': 'off',
-
-    // DTO/entity flexibility
-    '@typescript-eslint/require-await': 'off',
-
-    // Constructor injection sometimes unused initially
-    '@typescript-eslint/no-unused-vars': [
-      'warn',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
-    ],
-
-    // Better DX in monorepo
-    '@typescript-eslint/consistent-type-imports': [
-      'warn',
-      {
-        prefer: 'type-imports',
-      },
-    ],
-
-    // Prettier
-    'prettier/prettier': [
-      'error',
-      {
-        endOfLine: 'auto',
-      },
-    ],
-  },
-},
-{
-  ignores: ['eslint.config.mjs'],
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      // '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',      // ← ignore args starting with _
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+    },
   },
 );

@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/player-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////////////////////////////////
+// 👤 PLAYER (Global Identity)
+//////////////////////////////////////////////////////
+
+model Player {
+  id        String   @id @default(uuid())
+  fullName      String
+  shortName     String?
+  profilePhoto  String?
+  dateOfBirth   DateTime?
+  nationality   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gameProfiles PlayerGameProfile[]
+  tenantLinks  TenantPlayer[]
+  seasons      PlayerSeason[]
+  leagues      PlayerLeague[]
+}
+
+//////////////////////////////////////////////////////
+// 🏢 TENANT PLAYER (Multi-Tenant Layer)
+//////////////////////////////////////////////////////
+
+model TenantPlayer {
+  id         String @id @default(uuid())
+  tenantId   String
+  playerId   String
+
+  displayName String?
+  isActive    Boolean @default(true)
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@unique([tenantId, playerId])
+  @@index([tenantId])
+}
+
+//////////////////////////////////////////////////////
+// 🎮 PLAYER GAME PROFILE (Multi-Game Support)
+//////////////////////////////////////////////////////
+
+model PlayerGameProfile {
+  id        String     @id @default(uuid())
+  playerId       String
+  gameId         String
+
+  primaryRole    String?
+  secondaryRole  String?
+
+  skillRating    Float?
+  experience     Int?
+
+  attributes     Json?
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@index([gameId])
+}
+
+//////////////////////////////////////////////////////
+// 🏆 PLAYER LEAGUE (League Participation)
+//////////////////////////////////////////////////////
+
+model PlayerLeague {
+  id        String @id @default(uuid())
+  playerId  String
+  leagueId  String?
+
+  joinedAt DateTime @default(now())
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@unique([playerId, leagueId], map: "player_league_unique")
+}
+
+//////////////////////////////////////////////////////
+// 📅 PLAYER SEASON (Auction + Context Layer)
+//////////////////////////////////////////////////////
+
+model PlayerSeason {
+  id        String @id @default(uuid())
+
+  playerId  String
+  tenantId  String
+  leagueId  String
+  seasonId  String
+
+  basePrice Float
+  soldPrice Float?
+
+  status PlayerSeasonStatus @default(AVAILABLE)
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  team PlayerTeam?
+
+  stats PlayerStats[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([playerId, seasonId, leagueId])
+  @@index([tenantId])
+  @@index([leagueId])
+}
+
+//////////////////////////////////////////////////////
+// 🧑‍🤝‍🧑 PLAYER TEAM (Team Assignment per Season)
+//////////////////////////////////////////////////////
+
+model PlayerTeam {
+  id              String @id @default(uuid())
+  playerSeasonId  String
+  teamId          String
+
+  roleInTeam String?
+
+  playerSeason PlayerSeason @relation(fields: [playerSeasonId], references: [id])
+
+  @@unique([playerSeasonId])
+}
+
+//////////////////////////////////////////////////////
+// 📊 PLAYER STATS (Game-wise Flexible Stats)
+//////////////////////////////////////////////////////
+
+model PlayerStats {
+  id              String @id @default(uuid())
+
+  playerSeasonId  String
+  gameId          String
+
+  matches         Int    @default(0)
+
+  // Common metrics
+  average         Float?
+  rating          Float?
+
+  // 🔥 Dynamic game-specific stats
+  stats           Json?
+
+  playerSeason PlayerSeason @relation(fields: [playerSeasonId], references: [id])
+
+  @@unique([playerSeasonId, gameId])
+}
+
+//////////////////////////////////////////////////////
+// 🎯 ENUMS
+//////////////////////////////////////////////////////
+
+enum PlayerRole {
+  BATSMAN
+  BOWLER
+  ALL_ROUNDER
+  WICKET_KEEPER
+}
+
+enum PlayerSeasonStatus {
+  AVAILABLE
+  SOLD
+  UNSOLD
+}

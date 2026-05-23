@@ -5,7 +5,7 @@ export * from './clients';
 export * from './dtos';
 
 // Constants
-export * from './constants';
+export * from '../../auth/src/config';
 
 // Enum
 export * from './enums';

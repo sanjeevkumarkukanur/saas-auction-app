@@ -7,3 +7,4 @@ export * from './match-client.module';
 export * from './tenants-client.module';
 export * from './tournaments-client.module';
 export * from './platform-client.module';
+export * from './players-client.module';
