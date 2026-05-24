@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
+
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { SERVICE_PORTS, SERVICES } from '../../../auth/src/config';
+
+import { SERVICE_CONFIG, SERVICES } from '@libs/common';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
         name: SERVICES.BILLING_SERVICE,
+
         transport: Transport.TCP,
+
         options: {
-          host: process.env.BILLING_HOST || 'localhost',
-          port: SERVICE_PORTS.BILLING,
+          host: SERVICE_CONFIG.BILLING_SERVICE.host,
+
+          port: SERVICE_CONFIG.BILLING_SERVICE.port,
         },
       },
     ]),
   ],
+
   exports: [ClientsModule],
 })
 export class BillingClientModule {}

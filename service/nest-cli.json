@@ -16,6 +16,15 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
+    "auctions-service": {
+      "type": "application",
+      "root": "apps/auctions-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/auctions-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auctions-service/tsconfig.app.json"
+      }
+    },
     "auth": {
       "type": "library",
       "root": "libs/auth",
@@ -79,6 +88,15 @@
         "tsConfigPath": "apps/match-service/tsconfig.app.json"
       }
     },
+    "notifications-service": {
+      "type": "application",
+      "root": "apps/notifications-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifications-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifications-service/tsconfig.app.json"
+      }
+    },
     "platform-service": {
       "type": "application",
       "root": "apps/platform-service",
@@ -115,6 +133,15 @@
         "tsConfigPath": "libs/radius/tsconfig.lib.json"
       }
     },
+    "realtime-service": {
+      "type": "application",
+      "root": "apps/realtime-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/realtime-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/realtime-service/tsconfig.app.json"
+      }
+    },
     "service": {
       "type": "application",
       "root": "apps/service",
@@ -122,6 +149,15 @@
       "sourceRoot": "apps/service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/service/tsconfig.app.json"
+      }
+    },
+    "stats-service": {
+      "type": "application",
+      "root": "apps/stats-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/stats-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/stats-service/tsconfig.app.json"
       }
     },
     "team-service": {
@@ -140,6 +176,15 @@
       "sourceRoot": "apps/tenant-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/tenant-service/tsconfig.app.json"
+      }
+    },
+    "tournaments-service": {
+      "type": "application",
+      "root": "apps/tournaments-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/tournaments-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tournaments-service/tsconfig.app.json"
       }
     }
   }

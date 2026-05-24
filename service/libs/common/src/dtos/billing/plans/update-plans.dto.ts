@@ -1,6 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreatePlanDto } from './create-plans.dto';
-
 export class UpdatePlanDto {
   name?: string;
   price?: number;
@@ -8,4 +5,3 @@ export class UpdatePlanDto {
   description?: string;
   isActive?: boolean;
 }
-

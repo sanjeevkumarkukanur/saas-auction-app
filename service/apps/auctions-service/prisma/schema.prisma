@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/auction-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////////////////////////////////
+// 🏁 AUCTION (Core Auction Lifecycle)
+//////////////////////////////////////////////////////
+
+model Auction {
+  id        String   @id @default(uuid())
+
+  name      String
+  leagueId  String
+  seasonId  String
+  tenantId  String
+
+  status    AuctionStatus @default(PENDING)
+
+  startTime DateTime?
+  endTime   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bids      Bid[]
+
+  @@index([leagueId])
+  @@index([seasonId])
+  @@index([tenantId])
+}
+
+//////////////////////////////////////////////////////
+// 📊 BID HISTORY (IMPORTANT)
+//////////////////////////////////////////////////////
+
+model Bid {
+  id              String   @id @default(uuid())
+
+  auctionId       String
+  playerSeasonId  String   // comes from players-service
+  teamId          String   // comes from team-service
+
+  amount          Float
+
+  createdAt       DateTime @default(now())
+
+  auction Auction @relation(fields: [auctionId], references: [id])
+
+  @@index([auctionId])
+  @@index([playerSeasonId])
+  @@index([teamId])
+}
+
+
+model AuctionTeam {
+  id        String @id @default(uuid())
+
+  auctionId String
+  teamId    String
+
+  remainingBudget Float
+  totalPlayers    Int    @default(0)
+  overseasCount   Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, teamId])
+  @@index([auctionId])
+}
+
+model AuctionWallet {
+  id        String @id @default(uuid())
+
+  auctionId String
+  teamId    String
+
+  totalBudget     Float
+  remainingBudget Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([auctionId, teamId])
+  @@index([auctionId])
+}
+
+model AuctionLeague {
+  id        String @id @default(uuid())
+
+  auctionId String
+  leagueId  String
+
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, leagueId])
+  @@index([auctionId])
+}
+
+model AuctionSeason {
+  id        String @id @default(uuid())
+
+  auctionId String
+  seasonId  String
+
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, seasonId])
+  @@index([seasonId])
+}
+
+model AuctionPlayer {
+  id              String @id @default(uuid())
+
+  auctionId       String
+  playerSeasonId  String  // from players-service
+
+  basePrice       Float
+  soldPrice       Float?
+
+  status          AuctionPlayerStatus @default(AVAILABLE)
+
+  order           Int?   // auction order
+
+  isActive        Boolean @default(true)
+
+  createdAt       DateTime @default(now())
+
+  @@unique([auctionId, playerSeasonId])
+  @@index([auctionId])
+}
+
+model AuctionAuth {
+  id        String @id @default(uuid())
+
+  auctionId String
+  userId    String
+
+  role      AuctionRole
+
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, userId])
+}
+
+enum AuctionRole {
+  ADMIN
+  TEAM_OWNER
+  VIEWER
+}
+
+//////////////////////////////////////////////////////
+// ⚡ OPTIONAL: CURRENT BID SNAPSHOT (if not using Redis)
+//////////////////////////////////////////////////////
+
+model CurrentBid {
+  id              String   @id @default(uuid())
+
+  playerSeasonId  String
+  auctionId       String
+
+  teamId          String
+  amount          Float
+
+  updatedAt       DateTime @updatedAt
+
+  @@unique([playerSeasonId])
+}
+
+//////////////////////////////////////////////////////
+// 🎯 ENUMS
+//////////////////////////////////////////////////////
+
+enum AuctionStatus {
+  PENDING
+  LIVE
+  PAUSED
+  COMPLETED
+}
+enum AuctionPlayerStatus {
+  AVAILABLE
+  SOLD
+  UNSOLD
+}

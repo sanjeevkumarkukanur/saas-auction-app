@@ -1,10 +1,5 @@
+import { AUCTION_ROLE, AuctionRole } from '@libs/common/constants';
 import { IsString, IsEnum } from 'class-validator';
-
-export enum AuctionRole {
-  ADMIN = 'ADMIN',
-  TEAM_OWNER = 'TEAM_OWNER',
-  VIEWER = 'VIEWER',
-}
 
 export class AssignAuctionRoleDto {
   @IsString()
@@ -13,6 +8,6 @@ export class AssignAuctionRoleDto {
   @IsString()
   userId!: string;
 
-  @IsEnum(AuctionRole)
+  @IsEnum(AUCTION_ROLE)
   role!: AuctionRole;
 }

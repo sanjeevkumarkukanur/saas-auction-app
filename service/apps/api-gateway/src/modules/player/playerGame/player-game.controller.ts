@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PlayerGameProxy } from './player-game.proxy';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { CreatePlayerGameDto, UpdatePlayerGameDto } from '@app/common';
+import { CreatePlayerGameDto, UpdatePlayerGameDto } from '@libs/common';
 
 @ApiTags('Player Game')
 @Controller('player-game')

@@ -23,4 +23,4 @@ import { SERVICE_CONFIG, SERVICES } from '@libs/common';
 
   exports: [ClientsModule],
 })
-export class MatchClientModule {}
+export class PlayerClientModule {}

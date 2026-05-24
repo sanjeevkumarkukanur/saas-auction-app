@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/stats-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/*
+  Team stats per season or tournament
+*/
+model SeasonTeamStats {
+  id             String   @id @default(uuid())
+  seasonId       String
+  tournamentId   String
+  teamId         String
+
+  matchesPlayed  Int      @default(0)
+  wins           Int      @default(0)
+  losses         Int      @default(0)
+  ties           Int      @default(0)
+  noResults      Int      @default(0)
+
+  points         Int      @default(0)
+
+  runsScored     Int      @default(0)
+  runsConceded   Int      @default(0)
+  oversFaced     Float    @default(0)
+  oversBowled    Float    @default(0)
+
+  netRunRate     Float    @default(0)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([seasonId, teamId])
+}
+
+/*
+  Group level stats (for tournaments with groups)
+*/
+model GroupStats {
+  id           String   @id @default(uuid())
+  groupId      String
+  teamId       String
+
+  points       Int      @default(0)
+  netRunRate   Float    @default(0)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([groupId, teamId])
+}
+
+/*
+  Player aggregated stats
+*/
+model PlayerStats {
+  id            String   @id @default(uuid())
+  seasonId      String
+  playerId      String
+  teamId        String
+
+  matches       Int      @default(0)
+
+  totalRuns     Int      @default(0)
+  highestScore  Int      @default(0)
+  fifties       Int      @default(0)
+  hundreds      Int      @default(0)
+  strikeRate    Float    @default(0)
+
+  totalWickets  Int      @default(0)
+  economy       Float    @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([seasonId, playerId])
+}
+
+/*
+  Cached leaderboard JSON (for fast frontend)
+*/
+model LeaderboardCache {
+  id            String   @id @default(uuid())
+  tournamentId  String   @unique
+  payload       Json
+  updatedAt     DateTime @updatedAt
+}

@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/tournament-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tournament {
+  id        String           @id @default(uuid())
+  name      String
+  seasonId  String
+  status    TournamentStatus @default(UPCOMING)
+  startDate DateTime?
+  endDate   DateTime?
+
+  config TournamentConfig?
+  stages Stage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TournamentConfig {
+  id           String @id @default(uuid())
+  tournamentId String @unique
+  format       String
+  totalTeams   Int
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+}
+
+model Stage {
+  id           String @id @default(uuid())
+  name         String
+  type         String
+  order        Int
+  tournamentId String
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  groups     Group[]
+  fixtures   Fixture[]
+}
+
+model Group {
+  id      String @id @default(uuid())
+  name    String
+  stageId String
+
+  stage    Stage       @relation(fields: [stageId], references: [id])
+  teams    GroupTeam[]
+  fixtures Fixture[]
+  stats    GroupStats[]
+}
+
+model GroupTeam {
+  id      String @id @default(uuid())
+  groupId String
+  teamId  String
+
+  group Group @relation(fields: [groupId], references: [id])
+}
+
+model GroupStats {
+  id            String @id @default(uuid())
+
+  groupId       String
+  teamId        String
+
+  matchesPlayed Int     @default(0)
+  wins          Int     @default(0)
+  losses        Int     @default(0)
+  points        Int     @default(0)
+
+  runsScored    Int     @default(0)
+  runsConceded  Int     @default(0)
+
+  oversFaced    Float   @default(0)
+  oversBowled   Float   @default(0)
+
+  netRunRate    Float   @default(0)
+
+  group Group @relation(fields: [groupId], references: [id])
+
+  @@unique([groupId, teamId])
+}
+
+model Fixture {
+  id      String  @id @default(uuid())
+  stageId String?
+  groupId String?
+
+  homeTeamId String
+  awayTeamId String
+
+  round   Int
+  matchNo Int
+
+  stage Stage? @relation(fields: [stageId], references: [id])
+  group Group? @relation(fields: [groupId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum TournamentStatus {
+  UPCOMING
+  LIVE
+  COMPLETED
+}
