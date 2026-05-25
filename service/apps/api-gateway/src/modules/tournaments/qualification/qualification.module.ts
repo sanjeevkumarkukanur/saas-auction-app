@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { QualificationController } from './qualification.controller';
 import { QualificationProxy } from './qualification.proxy';
-import { TournamentsClientModule } from '../tournaments-client.module';
+import { TournamentsClientModule } from '@libs/common';
 
 @Module({
   imports: [TournamentsClientModule],

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GroupController } from './group.controller';
 import { GroupProxy } from './group.proxy';
-import { TournamentsClientModule } from '../tournaments-client.module';
+import { TournamentsClientModule } from '@libs/common';
 
 @Module({
   imports: [TournamentsClientModule],

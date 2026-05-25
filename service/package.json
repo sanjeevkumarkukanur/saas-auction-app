@@ -1,4 +1,5 @@
 {
+
   "name": "service",
   "version": "0.0.1",
   "description": "",
@@ -7,163 +8,183 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+
     "build:gateway": "nest build api-gateway",
+
     "build:auth": "nest build auth-service",
     "build:tenant": "nest build tenant-service",
+    "build:platform": "nest build platform-service",
+    "build:billing": "nest build billing-service",
+
+    "build:league": "nest build league-service",
     "build:team": "nest build team-service",
     "build:player": "nest build player-service",
     "build:game": "nest build game-service",
+
+    "build:auction": "nest build auction-service",
+    "build:match": "nest build match-service",
+    "build:tournament": "nest build tournament-service",
+    "build:field": "nest build field-service",
+    "build:stats": "nest build stats-service",
+
     "clean": "rm -rf dist",
+
     "clean:all": "rm -rf dist node_modules coverage",
+
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
     "typecheck": "tsc --noEmit",
+
     "start": "pnpm start:gateway:dev",
+
     "start:gateway": "nest start api-gateway",
     "start:gateway:dev": "nest start api-gateway --watch",
+
     "start:auth": "nest start auth-service",
     "start:auth:dev": "nest start auth-service --watch",
+
     "start:tenant": "nest start tenant-service",
     "start:tenant:dev": "nest start tenant-service --watch",
+
     "start:platform": "nest start platform-service",
     "start:platform:dev": "nest start platform-service --watch",
+
     "start:billing": "nest start billing-service",
     "start:billing:dev": "nest start billing-service --watch",
+
+    "start:league": "nest start league-service",
+    "start:league:dev": "nest start league-service --watch",
+
     "start:team": "nest start team-service",
     "start:team:dev": "nest start team-service --watch",
+
     "start:player": "nest start player-service",
     "start:player:dev": "nest start player-service --watch",
+
     "start:game": "nest start game-service",
     "start:game:dev": "nest start game-service --watch",
-    "start:sports": "concurrently \"pnpm start:team:dev\" \"pnpm start:player:dev\" \"pnpm start:game:dev\"",
-    "start:all": "concurrently \"pnpm start:gateway:dev\" \"pnpm start:auth:dev\" \"pnpm start:tenant:dev\" \"pnpm start:team:dev\" \"pnpm start:player:dev\" \"pnpm start:game:dev\"",
+
+    "start:auction": "nest start auction-service",
+    "start:auction:dev": "nest start auction-service --watch",
+
+    "start:match": "nest start match-service",
+    "start:match:dev": "nest start match-service --watch",
+
+    "start:tournament": "nest start tournament-service",
+    "start:tournament:dev": "nest start tournament-service --watch",
+
+    "start:field": "nest start field-service",
+    "start:field:dev": "nest start field-service --watch",
+
+    "start:stats": "nest start stats-service",
+    "start:stats:dev": "nest start stats-service --watch",
+
+    "start:sports": "concurrently \"pnpm start:league:dev\" \"pnpm start:team:dev\" \"pnpm start:player:dev\" \"pnpm start:game:dev\"",
+
+    "start:auction-system": "concurrently \"pnpm start:auction:dev\" \"pnpm start:match:dev\" \"pnpm start:tournament:dev\" \"pnpm start:field:dev\" \"pnpm start:stats:dev\"",
+
+    "start:core": "concurrently \"pnpm start:auth:dev\" \"pnpm start:tenant:dev\" \"pnpm start:platform:dev\" \"pnpm start:billing:dev\"",
+
+    "start:all": "concurrently \"pnpm start:gateway:dev\" \"pnpm start:auth:dev\" \"pnpm start:tenant:dev\" \"pnpm start:platform:dev\" \"pnpm start:billing:dev\" \"pnpm start:league:dev\" \"pnpm start:team:dev\" \"pnpm start:player:dev\" \"pnpm start:game:dev\" \"pnpm start:auction:dev\" \"pnpm start:match:dev\" \"pnpm start:tournament:dev\" \"pnpm start:field:dev\" \"pnpm start:stats:dev\"",
+
     "start:prod:gateway": "node dist/apps/api-gateway/main",
+
     "start:prod:auth": "node dist/apps/auth-service/main",
     "start:prod:tenant": "node dist/apps/tenant-service/main",
     "start:prod:platform": "node dist/apps/platform-service/main",
+    "start:prod:billing": "node dist/apps/billing-service/main",
+
+    "start:prod:league": "node dist/apps/league-service/main",
     "start:prod:team": "node dist/apps/team-service/main",
     "start:prod:player": "node dist/apps/player-service/main",
     "start:prod:game": "node dist/apps/game-service/main",
+
+    "start:prod:auction": "node dist/apps/auction-service/main",
+    "start:prod:match": "node dist/apps/match-service/main",
+    "start:prod:tournament": "node dist/apps/tournament-service/main",
+    "start:prod:field": "node dist/apps/field-service/main",
+    "start:prod:stats": "node dist/apps/stats-service/main",
+
     "prisma:gen:auth": "prisma generate --schema=apps/auth-service/prisma/schema.prisma",
+
     "prisma:gen:tenant": "prisma generate --schema=apps/tenant-service/prisma/schema.prisma",
+
     "prisma:gen:platform": "prisma generate --schema=apps/platform-service/prisma/schema.prisma",
+
     "prisma:gen:billing": "prisma generate --schema=apps/billing-service/prisma/schema.prisma",
+
+    "prisma:gen:league": "prisma generate --schema=apps/league-service/prisma/schema.prisma",
+
     "prisma:gen:team": "prisma generate --schema=apps/team-service/prisma/schema.prisma",
+
     "prisma:gen:player": "prisma generate --schema=apps/player-service/prisma/schema.prisma",
+
     "prisma:gen:game": "prisma generate --schema=apps/game-service/prisma/schema.prisma",
-    "prisma:gen:all": "pnpm prisma:gen:auth && pnpm prisma:gen:tenant && pnpm prisma:gen:team && pnpm prisma:gen:player && pnpm prisma:gen:game",
+
+    "prisma:gen:auction": "prisma generate --schema=apps/auction-service/prisma/schema.prisma",
+
+    "prisma:gen:match": "prisma generate --schema=apps/match-service/prisma/schema.prisma",
+
+    "prisma:gen:tournament": "prisma generate --schema=apps/tournament-service/prisma/schema.prisma",
+
+    "prisma:gen:field": "prisma generate --schema=apps/field-service/prisma/schema.prisma",
+
+    "prisma:gen:stats": "prisma generate --schema=apps/stats-service/prisma/schema.prisma",
+
+    "prisma:gen:all": "pnpm prisma:gen:auth && pnpm prisma:gen:tenant && pnpm prisma:gen:platform && pnpm prisma:gen:billing && pnpm prisma:gen:league && pnpm prisma:gen:team && pnpm prisma:gen:player && pnpm prisma:gen:game && pnpm prisma:gen:auction && pnpm prisma:gen:match && pnpm prisma:gen:tournament && pnpm prisma:gen:field && pnpm prisma:gen:stats",
+
     "prisma:migrate:auth": "prisma migrate dev --schema=apps/auth-service/prisma/schema.prisma",
-    "prisma:migrate:billing": "prisma migrate dev --schema=apps/billing-service/prisma/schema.prisma",
-    "prisma:migrate:platform": "prisma migrate dev --schema=apps/platform-service/prisma/schema.prisma",
+
     "prisma:migrate:tenant": "prisma migrate dev --schema=apps/tenant-service/prisma/schema.prisma",
+
+    "prisma:migrate:platform": "prisma migrate dev --schema=apps/platform-service/prisma/schema.prisma",
+
+    "prisma:migrate:billing": "prisma migrate dev --schema=apps/billing-service/prisma/schema.prisma",
+
+    "prisma:migrate:league": "prisma migrate dev --schema=apps/league-service/prisma/schema.prisma",
+
     "prisma:migrate:team": "prisma migrate dev --schema=apps/team-service/prisma/schema.prisma",
+
     "prisma:migrate:player": "prisma migrate dev --schema=apps/player-service/prisma/schema.prisma",
+
     "prisma:migrate:game": "prisma migrate dev --schema=apps/game-service/prisma/schema.prisma",
-    "prisma:migrate:all": "pnpm prisma:migrate:auth && prisma:migrate:platform && pnpm prisma:migrate:billing && pnpm prisma:migrate:tenant && pnpm prisma:migrate:team && pnpm prisma:migrate:player && pnpm prisma:migrate:game",
+
+    "prisma:migrate:auction": "prisma migrate dev --schema=apps/auction-service/prisma/schema.prisma",
+
+    "prisma:migrate:match": "prisma migrate dev --schema=apps/match-service/prisma/schema.prisma",
+
+    "prisma:migrate:tournament": "prisma migrate dev --schema=apps/tournament-service/prisma/schema.prisma",
+
+    "prisma:migrate:field": "prisma migrate dev --schema=apps/field-service/prisma/schema.prisma",
+
+    "prisma:migrate:stats": "prisma migrate dev --schema=apps/stats-service/prisma/schema.prisma",
+
     "prisma:studio:auth": "prisma studio --schema=apps/auth-service/prisma/schema.prisma",
-    "prisma:studio:billing": "prisma studio --schema=apps/billing-service/prisma/schema.prisma",
+
     "prisma:studio:tenant": "prisma studio --schema=apps/tenant-service/prisma/schema.prisma",
+
+    "prisma:studio:platform": "prisma studio --schema=apps/platform-service/prisma/schema.prisma",
+
+    "prisma:studio:billing": "prisma studio --schema=apps/billing-service/prisma/schema.prisma",
+
+    "prisma:studio:league": "prisma studio --schema=apps/league-service/prisma/schema.prisma",
+
     "prisma:studio:team": "prisma studio --schema=apps/team-service/prisma/schema.prisma",
+
     "prisma:studio:player": "prisma studio --schema=apps/player-service/prisma/schema.prisma",
+
     "prisma:studio:game": "prisma studio --schema=apps/game-service/prisma/schema.prisma",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/api-gateway/test/jest-e2e.json"
-  },
-  "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/jwt": "^11.0.2",
-    "@nestjs/microservices": "^11.1.19",
-    "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.4.2",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "bcrypt": "^6.0.0",
-    "bullmq": "^5.76.7",
-    "cache-manager": "^7.2.8",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.15.1",
-    "compression": "^1.8.1",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
-    "helmet": "^8.1.0",
-    "ioredis": "^5.10.1",
-    "joi": "^18.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "nestjs-pino": "^4.6.1",
-    "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
-    "pg": "^8.20.0",
-    "pino": "^10.3.1",
-    "pino-pretty": "^13.1.3",
-    "prisma": "^7.8.0",
-    "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.1",
-    "uuid": "^14.0.0"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
-    "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
-    "@types/bcrypt": "^6.0.0",
-    "@types/compression": "^1.8.1",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.0",
-    "@types/jest": "^30.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.10.7",
-    "@types/passport": "^1.0.17",
-    "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38",
-    "@types/pg": "^8.20.0",
-    "@types/supertest": "^6.0.2",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
-    "globals": "^16.0.0",
-    "jest": "^30.0.0",
-    "prettier": "^3.4.2",
-    "source-map-support": "^0.5.21",
-    "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "./coverage",
-    "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/apps/",
-      "<rootDir>/libs/"
-    ],
-    "moduleNameMapper": {
-      "^y/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
-      "^y/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^y/radius(|/.*)$": "<rootDir>/libs/radius/src/$1"
-    }
+
+    "prisma:studio:auction": "prisma studio --schema=apps/auction-service/prisma/schema.prisma",
+
+    "prisma:studio:match": "prisma studio --schema=apps/match-service/prisma/schema.prisma",
+
+    "prisma:studio:tournament": "prisma studio --schema=apps/tournament-service/prisma/schema.prisma",
+
+    "prisma:studio:field": "prisma studio --schema=apps/field-service/prisma/schema.prisma",
+
+    "prisma:studio:stats": "prisma studio --schema=apps/stats-service/prisma/schema.prisma"
   }
 }

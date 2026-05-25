@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { SendNotificationDto } from '@app/common';
+import { SendNotificationDto } from '@libs/common';
 
 @Injectable()
 export class NotificationProxy {

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsProxy } from './subscriptions.proxy';
-import { BillingClientModule } from '../billing-client.module';
+import { BillingClientModule } from '@libs/common';
 
 @Module({
   imports: [BillingClientModule],
